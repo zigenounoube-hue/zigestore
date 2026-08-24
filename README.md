@@ -18,7 +18,7 @@
 2. Source : Deploy from a branch → main → / (root)
 3. Save
 
-Ton store sera dispo sur : https://TON_USERNAME.github.io/zigestore
+Ton store sera dispo sur : https://zigenounoube-hue.github.io/zigestore/
 
 ### Étape 4 — Installer sur les téléphones
 1. Ouvre le lien sur Chrome Android
