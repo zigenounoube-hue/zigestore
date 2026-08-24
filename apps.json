@@ -1,0 +1,52 @@
+[
+  {
+    "name": "NewPipe",
+    "description": "YouTube sans pub ni compte Google. Télécharge vidéos et musique.",
+    "version": "v0.27.2",
+    "category": "Médias",
+    "apkUrl": "apks/newpipe.apk",
+    "iconEmoji": "▶️",
+    "sizeMb": 8.4,
+    "featured": true
+  },
+  {
+    "name": "Obtainium",
+    "description": "Met à jour tes apps directement depuis GitHub, sans Play Store.",
+    "version": "v1.4.0",
+    "category": "Utilitaires",
+    "apkUrl": "apks/obtainium.apk",
+    "iconEmoji": "⬇️",
+    "sizeMb": 5.1,
+    "featured": false
+  },
+  {
+    "name": "Bitwarden",
+    "description": "Gestionnaire de mots de passe open-source et sécurisé.",
+    "version": "v2024.12.0",
+    "category": "Confidentialité",
+    "apkUrl": "apks/bitwarden.apk",
+    "iconEmoji": "🔒",
+    "sizeMb": 12.0,
+    "featured": false
+  },
+  {
+    "name": "Aurora Store",
+    "description": "Client Play Store anonyme, sans compte Google requis.",
+    "version": "v4.3.5",
+    "category": "Système",
+    "apkUrl": "apks/aurora.apk",
+    "iconEmoji": "🌐",
+    "sizeMb": 7.2,
+    "featured": false
+  },
+  {
+    "name": "VLC",
+    "description": "Lecteur multimédia universel. Tous formats, sans prise de tête.",
+    "version": "v3.6.0",
+    "category": "Médias",
+    "apkUrl": "apks/vlc.apk",
+    "iconEmoji": "🎬",
+    "sizeMb": 19.3,
+    "featured": false
+  }
+]
