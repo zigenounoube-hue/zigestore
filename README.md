@@ -16,7 +16,7 @@
 
 ### 3. Activer GitHub Pages
 - **Settings** → **Pages** → Source : `main` → `/ (root)` → **Save**
-- Ton store sera dispo sur : `https://TON_USERNAME.github.io/zigestore`
+- Ton store sera dispo sur : `https://zigenounoube-hue.github.io/zigestore`
 
 ### 4. Installer sur les téléphones
 - Ouvre le lien dans **Chrome Android**
