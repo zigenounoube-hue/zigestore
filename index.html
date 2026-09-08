@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#8b7ff5"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="zigeStore"/>
+<title>zigeStore</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0b0b12;--s1:#111119;--s2:#14141f;--s3:#1a1a2e;
+  --border:#22223a;--border2:#3a3060;
+  --p:#8b7ff5;--p2:#6c61d4;--phi:#c4baff;--pdim:#2a1f4a;--pglow:#8b7ff530;
+  --text:#e8e2ff;--muted:#5a556e;--dim:#2e2a40;
+  --green:#4fffb0;--red:#ff5e6d;--orange:#ffb347;
+  --st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);
+  --radius:18px;--radius-sm:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overscroll-behavior:none;overflow:hidden}
+button{font-family:'Inter',sans-serif;cursor:pointer}
+a{text-decoration:none}
+img{display:block}
+
+/* ─── APP SHELL ─── */
+#app{display:flex;flex-direction:column;height:100%;max-width:480px;margin:0 auto;position:relative;overflow:hidden}
+
+/* ─── TOPBAR ─── */
+#topbar{
+  padding:calc(var(--st) + 12px) 18px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:.5px solid var(--border);
+  background:rgba(11,11,18,.95);
+  backdrop-filter:blur(20px);
+  position:relative;z-index:30;flex-shrink:0;
+}
+.logo{font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:700;filter:drop-shadow(0 0 14px var(--pglow))}
+.logo em{color:var(--phi);font-style:normal}
+.logo b{color:var(--p2)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.icon-btn{width:36px;height:36px;border-radius:50%;background:var(--s2);border:.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);transition:background .15s,color .15s}
+.icon-btn:active{background:var(--pdim);color:var(--phi)}
+#notif-btn{position:relative}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--p);border:1.5px solid var(--bg);display:none}
+.notif-dot.show{display:block}
+
+/* ─── INSTALL BANNER ─── */
+#install-banner{
+  display:none;margin:10px 14px 0;
+  padding:12px 14px;
+  background:linear-gradient(135deg,#1c1535,#12102a);
+  border:.5px solid var(--p2);border-radius:14px;
+  align-items:center;gap:10px;flex-shrink:0;
+}
+#install-banner .txt{flex:1;font-size:13px;color:var(--phi);font-weight:600}
+#install-banner .txt small{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:1px}
+#install-btn{background:var(--p);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;white-space:nowrap}
+#install-close{background:none;border:none;color:var(--muted);font-size:18px;padding:0 4px}
+
+/* ─── TABS CONTENT ─── */
+.tab-content{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
+.tab-content.active{display:flex}
+
+/* ─── STORE TAB ─── */
+#search-wrap{padding:12px 14px 4px;flex-shrink:0}
+.search-row{display:flex;gap:8px;align-items:center}
+.search-box{flex:1;position:relative}
+.search-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--muted);pointer-events:none}
+#search{
+  width:100%;background:var(--s1);border:.5px solid var(--border);
+  border-radius:var(--radius-sm);padding:10px 36px 10px 36px;
+  font-size:14px;color:var(--text);outline:none;font-family:'Inter',sans-serif;
+  transition:border-color .2s,box-shadow .2s;
+}
+#search::placeholder{color:var(--muted)}
+#search:focus{border-color:var(--p);box-shadow:0 0 0 3px var(--pglow)}
+#search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:var(--dim);border:none;border-radius:50%;width:20px;height:20px;display:none;align-items:center;justify-content:center;font-size:11px;color:var(--muted)}
+#search-clear.show{display:flex}
+.sort-btn{background:var(--s1);border:.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.sort-btn.active{border-color:var(--p);color:var(--phi)}
+
+#cats{display:flex;gap:7px;padding:10px 14px 6px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+#cats::-webkit-scrollbar{display:none}
+.cat-btn{padding:5px 14px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap;border:.5px solid var(--border);background:transparent;color:var(--muted);transition:all .18s}
+.cat-btn.active{background:var(--p);border-color:var(--p);color:#fff;box-shadow:0 0 16px var(--pglow)}
+
+.apps-stats{padding:2px 14px 8px;font-size:11px;color:var(--muted);flex-shrink:0}
+
+#content{flex:1;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:0 14px calc(var(--sb) + 80px)}
+#content::-webkit-scrollbar{display:none}
+.section-lbl{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin:14px 0 8px}
+
+/* ─── PULL TO REFRESH ─── */
+#ptr{height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:height .2s;flex-shrink:0}
+#ptr .ptr-inner{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--muted)}
+#ptr .ptr-spin{width:20px;height:20px;border:2px solid var(--dim);border-top-color:var(--p);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ─── APP CARD ─── */
+.app-card{
+  background:var(--s2);border:.5px solid var(--border);
+  border-radius:var(--radius);padding:13px;margin-bottom:9px;
+  display:flex;gap:11px;align-items:flex-start;
+  position:relative;overflow:hidden;
+  animation:fadeUp .35s ease both;
+}
+.app-card::before{content:'';position:absolute;inset:0;opacity:0;background:linear-gradient(135deg,var(--pglow),transparent 60%);transition:opacity .2s;pointer-events:none;border-radius:var(--radius)}
+.app-card:active{transform:scale(.985)}
+.app-card:active::before{opacity:1}
+.app-card.featured{border-color:var(--p2);background:linear-gradient(140deg,#171430 0%,var(--s2) 55%)}
+.app-icon{width:50px;height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:.5px solid var(--border2)}
+.card-body{flex:1;min-width:0}
+.card-name-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px}
+.card-name{font-size:14px;font-weight:600;color:var(--text)}
+.badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;flex-shrink:0}
+.badge-new{background:var(--pdim);border:.5px solid var(--p);color:var(--phi);letter-spacing:.04em}
+.badge-vedette{background:#2a1f4a;border:.5px solid #8b7ff5;color:#c4baff}
+.badge-soon{background:#1a1a0a;border:.5px solid #5a5020;color:#c8b060}
+.badge-cat{font-size:10px;padding:2px 8px;border-radius:999px;font-weight:500}
+.bc-Medias{background:#1a0f2a;color:#c084fc;border:.5px solid #6d28d9}
+.bc-Utilitaires{background:#0f1e2a;color:#67e8f9;border:.5px solid #0e7490}
+.bc-Systeme{background:#0f2a1a;color:#4ade80;border:.5px solid #166534}
+.bc-Confidentialite{background:#2a1510;color:#fb923c;border:.5px solid #9a3412}
+.card-desc{font-size:12px;color:var(--muted);margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4}
+.card-meta{font-size:10px;color:var(--dim)}
+.card-actions{display:flex;flex-direction:column;gap:6px;align-items:center;flex-shrink:0;margin-left:2px}
+.btn-dl{background:var(--pdim);border:.5px solid var(--p2);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;align-items:center;gap:1px;transition:all .18s}
+.btn-dl:active{background:var(--p2);box-shadow:0 0 14px var(--pglow)}
+.btn-dl .ico{font-size:16px}
+.btn-dl .lbl{font-size:9px;font-weight:700;color:var(--phi);letter-spacing:.03em}
+.btn-dl.unavailable{background:var(--s3);border-color:var(--border);opacity:.7}
+.btn-dl.unavailable .lbl{color:var(--muted)}
+.btn-info{background:transparent;border:.5px solid var(--border2);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--muted);transition:all .15s}
+.btn-info:active{background:var(--pdim);border-color:var(--p);color:var(--phi)}
+
+/* ─── EMPTY / LOADER ─── */
+#empty{display:none;text-align:center;padding:50px 20px}
+#empty .e-ico{font-size:44px;margin-bottom:12px}
+#empty p{font-size:14px;color:var(--muted)}
+#loader{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:60px 20px}
+.spinner{width:34px;height:34px;border:2.5px solid var(--dim);border-top-color:var(--p);border-radius:50%;animation:spin .7s linear infinite}
+#loader p{font-size:13px;color:var(--muted)}
+
+/* ─── DOWNLOADS TAB ─── */
+#tab-downloads{overflow-y:auto;scrollbar-width:none}
+#tab-downloads::-webkit-scrollbar{display:none}
+.tab-header{padding:20px 18px 12px;font-size:18px;font-weight:700;color:var(--text)}
+.tab-header span{display:block;font-size:12px;font-weight:400;color:var(--muted);margin-top:3px}
+.dl-item{background:var(--s2);border:.5px solid var(--border);border-radius:14px;padding:13px 14px;margin:0 14px 9px;display:flex;align-items:center;gap:12px}
+.dl-icon{font-size:28px;width:44px;height:44px;background:var(--pdim);border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dl-info{flex:1;min-width:0}
+.dl-name{font-size:14px;font-weight:600;color:var(--text)}
+.dl-date{font-size:11px;color:var(--muted);margin-top:2px}
+.dl-version{font-size:11px;color:var(--dim);margin-top:1px}
+.dl-badge{font-size:10px;padding:3px 9px;border-radius:999px;background:var(--pdim);border:.5px solid var(--p2);color:var(--phi);font-weight:600}
+.empty-dl{text-align:center;padding:60px 20px}
+.empty-dl .ico{font-size:48px;margin-bottom:14px}
+.empty-dl p{font-size:14px;color:var(--muted)}
+.tip-card{margin:0 14px 12px;padding:14px;background:linear-gradient(135deg,#1c1535,#12102a);border:.5px solid var(--p2);border-radius:14px}
+.tip-card h3{font-size:13px;color:var(--phi);margin-bottom:6px}
+.tip-card p{font-size:12px;color:var(--muted);line-height:1.5}
+.tip-card a{color:var(--p);text-decoration:underline}
+.action-row{display:flex;gap:8px;margin:0 14px 14px}
+.action-btn{flex:1;background:var(--s2);border:.5px solid var(--border);border-radius:12px;padding:12px;font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:7px;font-weight:500;transition:all .15s}
+.action-btn:active{background:var(--pdim);color:var(--phi);border-color:var(--p)}
+.action-btn.danger:active{background:#2a0f0f;color:var(--red);border-color:var(--red)}
+
+/* ─── SETTINGS TAB ─── */
+#tab-settings{overflow-y:auto;scrollbar-width:none}
+#tab-settings::-webkit-scrollbar{display:none}
+.settings-brand{padding:20px 18px 16px;display:flex;align-items:center;gap:14px;border-bottom:.5px solid var(--border);margin-bottom:8px}
+.brand-icon{width:54px;height:54px;background:var(--pdim);border-radius:16px;border:.5px solid var(--p2);display:flex;align-items:center;justify-content:center;font-size:26px}
+.brand-text h2{font-size:18px;font-weight:700;color:var(--phi);font-family:'Space Grotesk',sans-serif}
+.brand-text p{font-size:12px;color:var(--muted);margin-top:2px}
+.settings-section{padding:0 14px;margin-bottom:8px}
+.settings-section-title{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;padding:12px 4px 7px}
+.setting-item{background:var(--s2);border:.5px solid var(--border);display:flex;align-items:center;gap:13px;padding:14px;transition:background .15s;cursor:pointer}
+.setting-item:first-of-type{border-radius:14px 14px 0 0}
+.setting-item:last-of-type{border-radius:0 0 14px 14px;border-top:none}
+.setting-item:only-of-type{border-radius:14px}
+.setting-item+.setting-item{border-top:none}
+.setting-item:active{background:var(--pdim)}
+.si-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.si-text{flex:1;min-width:0}
+.si-text h4{font-size:14px;font-weight:500;color:var(--text)}
+.si-text p{font-size:12px;color:var(--muted);margin-top:1px}
+.si-arrow{color:var(--dim);font-size:16px}
+.si-value{font-size:12px;color:var(--muted)}
+.setting-item.danger .si-text h4{color:var(--red)}
+.version-footer{text-align:center;padding:24px 14px calc(var(--sb) + 80px);font-size:12px;color:var(--dim)}
+
+/* ─── BOTTOM NAV ─── */
+#navbar{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(11,11,18,.93);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-top:.5px solid var(--border);
+  padding:10px 0 calc(var(--sb) + 8px);
+  display:flex;justify-content:space-around;
+  z-index:30;flex-shrink:0;
+}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:0 18px;position:relative;user-select:none}
+.nav-ico{font-size:22px;opacity:.28;transition:all .18s;filter:none}
+.nav-lbl{font-size:10px;font-weight:500;color:var(--muted);transition:color .18s}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:var(--p);opacity:0;transition:opacity .18s;margin-top:1px}
+.nav-item.active .nav-ico{opacity:1;filter:drop-shadow(0 0 7px var(--p))}
+.nav-item.active .nav-lbl{color:var(--phi)}
+.nav-item.active .nav-dot{opacity:1}
+.nav-badge{position:absolute;top:0;right:12px;background:var(--p);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;border:2px solid var(--bg)}
+.nav-badge.show{display:flex}
+
+/* ─── APP MODAL ─── */
+#app-modal{
+  position:absolute;inset:0;z-index:50;
+  background:var(--bg);
+  transform:translateY(100%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+#app-modal.open{transform:translateY(0)}
+.modal-topbar{
+  padding:calc(var(--st) + 10px) 16px 10px;
+  display:flex;align-items:center;gap:12px;
+  border-bottom:.5px solid var(--border);
+  background:rgba(11,11,18,.95);backdrop-filter:blur(20px);
+  flex-shrink:0;
+}
+.modal-back{width:36px;height:36px;border-radius:50%;background:var(--s2);border:.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--muted);flex-shrink:0}
+.modal-title{flex:1;font-size:15px;font-weight:600;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.modal-share{width:36px;height:36px;border-radius:50%;background:var(--s2);border:.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted)}
+.modal-body{flex:1;overflow-y:auto;scrollbar-width:none;overscroll-behavior:contain}
+.modal-body::-webkit-scrollbar{display:none}
+
+.modal-hero{padding:22px 18px 16px;display:flex;gap:16px;align-items:flex-start}
+.modal-icon{width:72px;height:72px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:34px;flex-shrink:0;border:.5px solid var(--border2)}
+.modal-hero-text{flex:1;min-width:0}
+.modal-name{font-size:22px;font-weight:700;color:var(--text);font-family:'Space Grotesk',sans-serif;line-height:1.2}
+.modal-dev{font-size:13px;color:var(--muted);margin-top:4px}
+.modal-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+
+.modal-actions{padding:0 18px 18px;display:flex;gap:10px}
+.btn-primary{flex:1;background:var(--p);border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 4px 20px var(--pglow)}
+.btn-primary:active{background:var(--p2);transform:scale(.97)}
+.btn-primary.unavailable{background:var(--s3);border:.5px solid var(--border);color:var(--muted);box-shadow:none;font-weight:500}
+.btn-ext{background:var(--s2);border:.5px solid var(--border2);border-radius:14px;padding:14px 16px;font-size:15px;font-weight:600;color:var(--phi);display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;white-space:nowrap}
+.btn-ext:active{background:var(--pdim)}
+
+/* Screenshots */
+.screenshots-section{padding:0 0 8px}
+.screenshots-section h3{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:0 18px 10px}
+.screenshots-scroll{display:flex;gap:10px;overflow-x:auto;padding:0 18px 12px;scrollbar-width:none}
+.screenshots-scroll::-webkit-scrollbar{display:none}
+.screenshot{width:140px;height:250px;border-radius:12px;object-fit:cover;border:.5px solid var(--border);flex-shrink:0;background:var(--s2)}
+.screenshot-placeholder{width:140px;height:250px;border-radius:12px;border:.5px solid var(--border);flex-shrink:0;background:var(--s2);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--dim);font-size:12px}
+.screenshot-placeholder span{font-size:28px}
+.no-screenshots{padding:10px 18px 16px;font-size:13px;color:var(--dim)}
+
+/* Info sections */
+.modal-section{padding:16px 18px;border-top:.5px solid var(--border)}
+.modal-section h3{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.modal-section p{font-size:14px;color:var(--text);line-height:1.65}
+.changelog-text{font-size:13px;color:var(--muted);line-height:1.8;white-space:pre-line}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.info-cell{background:var(--s2);border:.5px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+.info-cell .val{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px}
+.info-cell .key{font-size:11px;color:var(--muted)}
+
+.perms-list{display:flex;flex-direction:column;gap:7px}
+.perm-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text)}
+.perm-dot{width:6px;height:6px;border-radius:50%;background:var(--p);flex-shrink:0}
+
+.modal-links{padding:16px 18px 12px;border-top:.5px solid var(--border);display:flex;gap:9px}
+.link-btn{flex:1;background:var(--s2);border:.5px solid var(--border);border-radius:12px;padding:11px 10px;font-size:12px;font-weight:500;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s}
+.link-btn:active{background:var(--pdim);color:var(--phi);border-color:var(--p)}
+
+/* ─── GUIDE MODAL ─── */
+#guide-modal{
+  position:absolute;inset:0;z-index:60;
+  background:rgba(11,11,18,.92);backdrop-filter:blur(10px);
+  display:flex;align-items:flex-end;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+#guide-modal.open{opacity:1;pointer-events:auto}
+.guide-sheet{
+  background:var(--s1);border-radius:24px 24px 0 0;border:.5px solid var(--border);
+  width:100%;padding:20px 20px calc(var(--sb) + 24px);
+  transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
+#guide-modal.open .guide-sheet{transform:translateY(0)}
+.guide-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 18px}
+.guide-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;font-family:'Space Grotesk',sans-serif}
+.guide-sub{font-size:13px;color:var(--muted);margin-bottom:18px}
+.guide-step{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--pdim);border:.5px solid var(--p);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--phi);flex-shrink:0;margin-top:1px}
+.step-text h4{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.step-text p{font-size:12px;color:var(--muted);line-height:1.4}
+.guide-close{width:100%;background:var(--p);border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:700;color:#fff;margin-top:8px;transition:background .15s}
+.guide-close:active{background:var(--p2)}
+
+/* ─── SORT SHEET ─── */
+#sort-sheet{
+  position:absolute;inset:0;z-index:55;
+  background:rgba(11,11,18,.85);backdrop-filter:blur(8px);
+  display:flex;align-items:flex-end;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+#sort-sheet.open{opacity:1;pointer-events:auto}
+.sort-inner{background:var(--s1);border-radius:20px 20px 0 0;border:.5px solid var(--border);width:100%;padding:16px 0 calc(var(--sb) + 16px);transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+#sort-sheet.open .sort-inner{transform:translateY(0)}
+.sort-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 14px}
+.sort-title{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:0 18px 10px}
+.sort-option{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;font-size:15px;color:var(--text);transition:background .15s}
+.sort-option:active{background:var(--s2)}
+.sort-option.selected{color:var(--phi)}
+.sort-option .check{color:var(--p);font-size:16px;opacity:0}
+.sort-option.selected .check{opacity:1}
+
+/* ─── TOAST ─── */
+#toast{
+  position:absolute;bottom:calc(var(--sb) + 80px);left:50%;transform:translateX(-50%) translateY(20px);
+  background:#1e1d30;border:.5px solid var(--border2);
+  border-radius:999px;padding:10px 18px;
+  font-size:13px;font-weight:500;color:var(--phi);
+  white-space:nowrap;z-index:100;
+  opacity:0;transition:opacity .25s,transform .25s;
+  pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="logo"><em>zige</em><b>Store</b></div>
+  <div class="topbar-right">
+    <button class="icon-btn" id="notif-btn" onclick="openGuide()">
+      ❓
+      <span class="notif-dot" id="notif-dot"></span>
+    </button>
+    <button class="icon-btn" onclick="shareStore()">🔗</button>
+  </div>
+</div>
+
+<!-- INSTALL BANNER -->
+<div id="install-banner">
+  <div class="txt">Installer zigeStore <small>Ajouter à l'écran d'accueil</small></div>
+  <button id="install-btn">Installer</button>
+  <button id="install-close" onclick="document.getElementById('install-banner').style.display='none'">✕</button>
+</div>
+
+<!-- STORE TAB -->
+<div id="tab-store" class="tab-content active">
+  <div id="search-wrap">
+    <div class="search-row">
+      <div class="search-box">
+        <span class="search-ico">🔍</span>
+        <input id="search" type="search" placeholder="Rechercher…" autocomplete="off"/>
+        <button id="search-clear" onclick="clearSearch()">✕</button>
+      </div>
+      <button class="sort-btn" id="sort-btn" onclick="openSort()">⇅ Trier</button>
+    </div>
+  </div>
+
+  <div id="cats">
+    <button class="cat-btn active" data-cat="Toutes">Toutes</button>
+    <button class="cat-btn" data-cat="Médias">Médias</button>
+    <button class="cat-btn" data-cat="Utilitaires">Utilitaires</button>
+    <button class="cat-btn" data-cat="Système">Système</button>
+    <button class="cat-btn" data-cat="Confidentialité">Confidentialité</button>
+  </div>
+
+  <div class="apps-stats" id="apps-stats"></div>
+
+  <div id="ptr"><div class="ptr-inner"><div class="ptr-spin"></div><span>Mise à jour…</span></div></div>
+
+  <div id="content">
+    <div id="loader"><div class="spinner"></div><p>Chargement des apps…</p></div>
+    <div id="empty" style="display:none">
+      <div class="e-ico">🔭</div>
+      <p>Aucune app trouvée.</p>
+    </div>
+    <div id="app-list"></div>
+  </div>
+</div>
+
+<!-- DOWNLOADS TAB -->
+<div id="tab-downloads" class="tab-content" style="padding-bottom:calc(var(--sb) + 80px)">
+  <div class="tab-header">Téléchargements <span>Historique de tes APK</span></div>
+  <div id="dl-list"></div>
+</div>
+
+<!-- SETTINGS TAB -->
+<div id="tab-settings" class="tab-content" style="padding-bottom:calc(var(--sb) + 80px)">
+  <div class="settings-brand">
+    <div class="brand-icon">⚡</div>
+    <div class="brand-text">
+      <h2>zigeStore</h2>
+      <p>Store APK privé famille · v1.0.0</p>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Aide</div>
+    <div class="setting-item" onclick="openGuide()">
+      <div class="si-icon" style="background:#1a1530">📲</div>
+      <div class="si-text"><h4>Comment installer un APK</h4><p>Activer les sources inconnues</p></div>
+      <span class="si-arrow">›</span>
+    </div>
+    <div class="setting-item" onclick="shareStore()">
+      <div class="si-icon" style="background:#0f2a1a">🔗</div>
+      <div class="si-text"><h4>Partager le store</h4><p>Envoyer le lien à la famille</p></div>
+      <span class="si-arrow">›</span>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Données</div>
+    <div class="setting-item" onclick="refreshApps()">
+      <div class="si-icon" style="background:#0f1e2a">🔄</div>
+      <div class="si-text"><h4>Actualiser la liste</h4><p>Recharger apps.json depuis GitHub</p></div>
+      <span class="si-arrow">›</span>
+    </div>
+    <div class="setting-item danger" onclick="clearHistory()">
+      <div class="si-icon" style="background:#2a0f0f">🗑️</div>
+      <div class="si-text"><h4>Effacer l'historique</h4><p>Supprimer tous les téléchargements</p></div>
+      <span class="si-arrow">›</span>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">À propos</div>
+    <div class="setting-item">
+      <div class="si-icon" style="background:#1a1530">👤</div>
+      <div class="si-text"><h4>Créé par Ayoub</h4><p>Store privé famille — 2025</p></div>
+      <span class="si-value">❤️</span>
+    </div>
+    <div class="setting-item">
+      <div class="si-icon" style="background:#0f2a1a">⚡</div>
+      <div class="si-text"><h4>Version</h4><p>zigeStore PWA</p></div>
+      <span class="si-value" style="font-size:12px;color:var(--muted)">v1.0.0</span>
+    </div>
+  </div>
+
+  <div class="version-footer">zigeStore · Made with 💜 by Ayoub</div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav id="navbar">
+  <div class="nav-item active" data-tab="store">
+    <span class="nav-ico">⊞</span><span class="nav-lbl">Store</span><span class="nav-dot"></span>
+  </div>
+  <div class="nav-item" data-tab="downloads">
+    <span class="nav-ico">⬇</span><span class="nav-lbl">Téléchargements</span><span class="nav-dot"></span>
+    <span class="nav-badge" id="dl-badge"></span>
+  </div>
+  <div class="nav-item" data-tab="settings">
+    <span class="nav-ico">⚙</span><span class="nav-lbl">Paramètres</span><span class="nav-dot"></span>
+  </div>
+</nav>
+
+<!-- APP DETAIL MODAL -->
+<div id="app-modal">
+  <div class="modal-topbar">
+    <button class="modal-back" onclick="closeModal()">←</button>
+    <div class="modal-title" id="modal-title">App</div>
+    <button class="modal-share" id="modal-share-btn">↗</button>
+  </div>
+  <div class="modal-body" id="modal-body"></div>
+</div>
+
+<!-- INSTALL GUIDE MODAL -->
+<div id="guide-modal" onclick="closeGuide(event)">
+  <div class="guide-sheet">
+    <div class="guide-handle"></div>
+    <div class="guide-title">📲 Installer un APK</div>
+    <div class="guide-sub">Active les sources inconnues en 4 étapes</div>
+    <div class="guide-step">
+      <div class="step-num">1</div>
+      <div class="step-text"><h4>Télécharge l'APK</h4><p>Tape le bouton de téléchargement dans zigeStore.</p></div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">2</div>
+      <div class="step-text"><h4>Ouvre le fichier téléchargé</h4><p>Dans les notifications ou dans Fichiers → Téléchargements.</p></div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">3</div>
+      <div class="step-text"><h4>Autoriser la source</h4><p>Android demande d'autoriser l'installation depuis "Chrome" ou ton navigateur. Accepte.</p></div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">4</div>
+      <div class="step-text"><h4>Installer</h4><p>Tape "Installer" et l'app apparaît dans ton menu.</p></div>
+    </div>
+    <button class="guide-close" onclick="closeGuide()">Compris !</button>
+  </div>
+</div>
+
+<!-- SORT SHEET -->
+<div id="sort-sheet" onclick="closeSortOutside(event)">
+  <div class="sort-inner">
+    <div class="sort-handle"></div>
+    <div class="sort-title">Trier par</div>
+    <div class="sort-option selected" data-sort="default" onclick="setSort('default',this)">
+      Par défaut <span class="check">✓</span>
+    </div>
+    <div class="sort-option" data-sort="az" onclick="setSort('az',this)">
+      A → Z <span class="check">✓</span>
+    </div>
+    <div class="sort-option" data-sort="za" onclick="setSort('za',this)">
+      Z → A <span class="check">✓</span>
+    </div>
+    <div class="sort-option" data-sort="size" onclick="setSort('size',this)">
+      Taille (croissante) <span class="check">✓</span>
+    </div>
+    <div class="sort-option" data-sort="newest" onclick="setSort('newest',this)">
+      Plus récent <span class="check">✓</span>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ─── STATE ───
+let allApps=[], currentCat='Toutes', searchVal='', sortBy='default';
+let currentModal=null;
+let dlHistory=JSON.parse(localStorage.getItem('zige_dl')||'[]');
+
+// ─── INIT ───
+loadApps();
+renderDlTab();
+updateDlBadge();
+
+// Nav
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click',()=>setTab(item.dataset.tab));
+});
+
+// Cat tabs
+document.getElementById('cats').addEventListener('click',e=>{
+  const btn=e.target.closest('.cat-btn');
+  if(!btn)return;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentCat=btn.dataset.cat;
+  render();
+});
+
+// Search
+const searchEl=document.getElementById('search');
+const clearEl=document.getElementById('search-clear');
+searchEl.addEventListener('input',e=>{
+  searchVal=e.target.value.toLowerCase().trim();
+  clearEl.classList.toggle('show',searchVal.length>0);
+  render();
+});
+
+// Pull to refresh
+let touchStart=0, ptrActive=false;
+const content=document.getElementById('content');
+const ptr=document.getElementById('ptr');
+content.addEventListener('touchstart',e=>{if(content.scrollTop===0)touchStart=e.touches[0].clientY;},{ passive:true });
+content.addEventListener('touchmove',e=>{
+  if(!touchStart)return;
+  const dy=e.touches[0].clientY-touchStart;
+  if(dy>60&&content.scrollTop===0&&!ptrActive){
+    ptrActive=true;ptr.style.height='52px';
+  }
+},{ passive:true });
+content.addEventListener('touchend',()=>{
+  if(ptrActive){
+    ptrActive=false;
+    setTimeout(()=>{ptr.style.height='0';},400);
+    refreshApps();
+  }
+  touchStart=0;
+});
+
+// PWA install
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  document.getElementById('install-banner').style.display='flex';
+  document.getElementById('notif-dot').classList.add('show');
+});
+document.getElementById('install-btn').addEventListener('click',async()=>{
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();
+  const{outcome}=await deferredPrompt.userChoice;
+  deferredPrompt=null;
+  document.getElementById('install-banner').style.display='none';
+  if(outcome==='accepted')toast('✅ zigeStore installé !');
+});
+
+// Service worker
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+
+// ─── LOAD ───
+async function loadApps(){
+  try{
+    const r=await fetch('apps.json?t='+Date.now());
+    allApps=await r.json();
+    document.getElementById('loader').style.display='none';
+    render();
+  }catch(e){
+    document.getElementById('loader').innerHTML='<p style="color:var(--red);font-size:13px">Impossible de charger les apps.<br>Vérifie ta connexion.</p>';
+  }
+}
+
+async function refreshApps(){
+  document.getElementById('loader').style.display='flex';
+  document.getElementById('app-list').innerHTML='';
+  await loadApps();
+  toast('🔄 Liste mise à jour');
+}
+
+// ─── RENDER ───
+function render(){
+  const list=document.getElementById('app-list');
+  const empty=document.getElementById('empty');
+  const stats=document.getElementById('apps-stats');
+
+  let apps=allApps.filter(a=>{
+    const catOk=currentCat==='Toutes'||a.category===currentCat;
+    const srchOk=!searchVal||a.name.toLowerCase().includes(searchVal)||a.description.toLowerCase().includes(searchVal);
+    return catOk&&srchOk;
+  });
+
+  // Sort
+  if(sortBy==='az')apps.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(sortBy==='za')apps.sort((a,b)=>b.name.localeCompare(a.name));
+  else if(sortBy==='size')apps.sort((a,b)=>a.sizeMb-b.sizeMb);
+  else if(sortBy==='newest')apps.sort((a,b)=>new Date(b.addedDate)-new Date(a.addedDate));
+
+  stats.textContent=apps.length+' app'+(apps.length>1?'s':'')+' disponible'+(apps.length>1?'s':'');
+
+  if(!apps.length){list.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+
+  const featured=sortBy==='default'?apps.filter(a=>a.featured):[];
+  const rest=sortBy==='default'?apps.filter(a=>!a.featured):apps;
+  let html='';
+  if(featured.length){html+='<div class="section-lbl">⚡ En vedette</div>';featured.forEach(a=>{html+=cardHTML(a);});}
+  if(rest.length){
+    if(featured.length)html+='<div class="section-lbl">Toutes les apps</div>';
+    rest.forEach(a=>{html+=cardHTML(a);});
+  }
+  list.innerHTML=html;
+  list.querySelectorAll('.app-card').forEach((el,i)=>{el.style.animationDelay=(i*45)+'ms';});
+}
+
+function catSlug(cat){return cat.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s/g,'');}
+
+function isNew(dateStr){
+  const d=new Date(dateStr),now=new Date();
+  return (now-d)<30*24*3600*1000;
+}
+
+function cardHTML(a){
+  const cs=catSlug(a.category);
+  const newBadge=isNew(a.addedDate)?'<span class="badge badge-new">NOUVEAU</span>':'';
+  const featBadge=a.featured?'<span class="badge badge-vedette">⭐ VEDETTE</span>':'';
+  const soonBadge=!a.available?'<span class="badge badge-soon">Bientôt</span>':'';
+  const dlLabel=a.available?'APK':'EXT';
+  const dlIco=a.available?'⬇':'🔗';
+  return `<div class="app-card${a.featured?' featured':''}" >
+    <div class="app-icon" style="background:${a.iconBg||'var(--pdim)'}">${a.iconEmoji}</div>
+    <div class="card-body">
+      <div class="card-name-row">
+        <span class="card-name">${a.name}</span>
+        ${newBadge}${featBadge}${soonBadge}
+        <span class="badge badge-cat bc-${cs}">${a.category}</span>
+      </div>
+      <div class="card-desc">${a.description}</div>
+      <div class="card-meta">${a.version} · ${a.sizeMb} MB · ${a.developer}</div>
+    </div>
+    <div class="card-actions">
+      <button class="btn-dl${!a.available&&!a.externalUrl?' unavailable':''}" onclick="handleDownload(${JSON.stringify(a).replace(/"/g,'&quot;')})">
+        <span class="ico">${dlIco}</span><span class="lbl">${dlLabel}</span>
+      </button>
+      <button class="btn-info" onclick="openModal(${JSON.stringify(a).replace(/"/g,'&quot;')})">ⓘ</button>
+    </div>
+  </div>`;
+}
+
+// ─── DOWNLOAD ───
+function handleDownload(a){
+  if(a.available&&a.apkUrl){
+    const link=document.createElement('a');
+    link.href=a.apkUrl;link.download=a.name+'.apk';
+    link.click();
+    saveDl(a);
+    toast('⬇️ Téléchargement démarré !');
+  } else if(a.externalUrl){
+    window.open(a.externalUrl,'_blank');
+    saveDl(a);
+    toast('🔗 Source ouverte dans le navigateur');
+  } else {
+    toast('⏳ APK bientôt disponible');
+  }
+}
+
+function saveDl(a){
+  const entry={id:a.id,name:a.name,emoji:a.iconEmoji,version:a.version,date:new Date().toISOString()};
+  dlHistory.unshift(entry);
+  if(dlHistory.length>50)dlHistory=dlHistory.slice(0,50);
+  localStorage.setItem('zige_dl',JSON.stringify(dlHistory));
+  updateDlBadge();
+  renderDlTab();
+}
+
+// ─── DOWNLOADS TAB ───
+function renderDlTab(){
+  const el=document.getElementById('dl-list');
+  if(!dlHistory.length){
+    el.innerHTML=`
+      <div class="empty-dl">
+        <div class="ico">📭</div>
+        <p>Aucun téléchargement pour l'instant.<br>Lance-toi !</p>
+      </div>
+      <div class="tip-card" style="margin:0 14px 14px">
+        <h3>💡 Comment installer un APK</h3>
+        <p>Après le téléchargement, ouvre le fichier et autorise les sources inconnues. <a onclick="openGuide()" style="cursor:pointer">Voir le guide →</a></p>
+      </div>`;
+    return;
+  }
+  let html='<div class="action-row"><button class="action-btn danger" onclick="clearHistory()">🗑️ Effacer tout</button></div>';
+  dlHistory.forEach(d=>{
+    const dt=new Date(d.date);
+    const fmt=dt.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    html+=`<div class="dl-item">
+      <div class="dl-icon">${d.emoji}</div>
+      <div class="dl-info">
+        <div class="dl-name">${d.name}</div>
+        <div class="dl-version">${d.version}</div>
+        <div class="dl-date">📅 ${fmt}</div>
+      </div>
+      <span class="dl-badge">APK</span>
+    </div>`;
+  });
+  html+=`<div class="tip-card" style="margin:10px 14px 14px">
+    <h3>💡 Problème d'installation ?</h3>
+    <p>Active les sources inconnues dans tes paramètres Android. <a onclick="openGuide()" style="cursor:pointer">Voir le guide →</a></p>
+  </div>`;
+  el.innerHTML=html;
+}
+
+function updateDlBadge(){
+  const badge=document.getElementById('dl-badge');
+  if(dlHistory.length>0){badge.textContent=dlHistory.length>9?'9+':dlHistory.length;badge.classList.add('show');}
+  else badge.classList.remove('show');
+}
+
+function clearHistory(){
+  if(!dlHistory.length)return;
+  dlHistory=[];
+  localStorage.removeItem('zige_dl');
+  updateDlBadge();
+  renderDlTab();
+  toast('🗑️ Historique effacé');
+}
+
+// ─── APP MODAL ───
+function openModal(a){
+  currentModal=a;
+  document.getElementById('modal-title').textContent=a.name;
+  document.getElementById('modal-share-btn').onclick=()=>shareApp(a);
+
+  const cs=catSlug(a.category);
+  const soonBadge=!a.available?'<span class="badge badge-soon">Bientôt disponible</span>':'';
+  const newBadge=isNew(a.addedDate)?'<span class="badge badge-new">NOUVEAU</span>':'';
+
+  const dlBtn=a.available&&a.apkUrl
+    ?`<button class="btn-primary" onclick="handleDownload(${JSON.stringify(a).replace(/"/g,"'")});toast('⬇️ Démarré !')">⬇️ Télécharger APK</button>`
+    :a.externalUrl
+      ?`<button class="btn-primary" onclick="handleDownload(${JSON.stringify(a).replace(/"/g,"'")})">🔗 Source officielle</button>`
+      :`<button class="btn-primary unavailable">⏳ Bientôt disponible</button>`;
+
+  const extBtn=a.externalUrl&&a.available
+    ?`<a class="btn-ext" href="${a.externalUrl}" target="_blank">🌐 Source</a>`:'';
+
+  // Screenshots
+  let screensHTML='';
+  if(a.screenshots&&a.screenshots.length){
+    screensHTML=`<div class="screenshots-section">
+      <h3>Captures d'écran</h3>
+      <div class="screenshots-scroll">
+        ${a.screenshots.map(s=>`<img class="screenshot" src="${s}" onerror="this.style.display='none'" loading="lazy"/>`).join('')}
+      </div>
+    </div>`;
+  } else {
+    screensHTML=`<div class="screenshots-section"><h3>Captures d'écran</h3><div class="no-screenshots">Aucune capture disponible.</div></div>`;
+  }
+
+  // Permissions
+  const permsHTML=a.permissions&&a.permissions.length
+    ?a.permissions.map(p=>`<div class="perm-item"><span class="perm-dot"></span>${p}</div>`).join('')
+    :'<div style="font-size:13px;color:var(--muted)">Aucune permission listée.</div>';
+
+  // Date formatée
+  const addedFmt=a.addedDate?new Date(a.addedDate).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'}):'—';
+
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-hero">
+      <div class="modal-icon" style="background:${a.iconBg||'var(--pdim)'}">${a.iconEmoji}</div>
+      <div class="modal-hero-text">
+        <div class="modal-name">${a.name}</div>
+        <div class="modal-dev">par ${a.developer}</div>
+        <div class="modal-tags">
+          <span class="badge badge-cat bc-${cs}">${a.category}</span>
+          ${newBadge}${soonBadge}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      ${dlBtn}
+      ${extBtn}
+    </div>
+
+    ${screensHTML}
+
+    <div class="modal-section">
+      <h3>À propos</h3>
+      <p>${a.longDescription||a.description}</p>
+    </div>
+
+    <div class="modal-section">
+      <h3>Informations</h3>
+      <div class="info-grid">
+        <div class="info-cell"><div class="val">${a.version}</div><div class="key">Version</div></div>
+        <div class="info-cell"><div class="val">${a.sizeMb} MB</div><div class="key">Taille</div></div>
+        <div class="info-cell"><div class="val">${a.category}</div><div class="key">Catégorie</div></div>
+        <div class="info-cell"><div class="val">${addedFmt}</div><div class="key">Ajouté le</div></div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h3>Nouveautés</h3>
+      <div class="changelog-text">${a.changelog||'Aucune note de version.'}</div>
+    </div>
+
+    <div class="modal-section">
+      <h3>Permissions</h3>
+      <div class="perms-list">${permsHTML}</div>
+    </div>
+
+    ${a.website?`<div class="modal-links">
+      <a class="link-btn" href="${a.website}" target="_blank">🌐 Site officiel</a>
+      ${a.externalUrl?`<a class="link-btn" href="${a.externalUrl}" target="_blank">📦 Releases</a>`:''}
+      <button class="link-btn" onclick="shareApp(${JSON.stringify(a).replace(/"/g,"'")})">↗ Partager</button>
+    </div>`:''}
+
+    <div style="height:20px"></div>`;
+
+  document.getElementById('app-modal').classList.add('open');
+  document.getElementById('modal-body').scrollTop=0;
+}
+
+function closeModal(){
+  document.getElementById('app-modal').classList.remove('open');
+  currentModal=null;
+}
+
+// Swipe modal
+let mTouchX=0,mTouchY=0;
+const modal=document.getElementById('app-modal');
+modal.addEventListener('touchstart',e=>{mTouchX=e.touches[0].clientX;mTouchY=e.touches[0].clientY;},{passive:true});
+modal.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-mTouchX;
+  const dy=e.changedTouches[0].clientY-mTouchY;
+  if(Math.abs(dx)<30&&dy>80&&document.getElementById('modal-body').scrollTop===0)closeModal();
+});
+
+// ─── TABS ───
+function setTab(tab){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.querySelector(`.nav-item[data-tab="${tab}"]`).classList.add('active');
+  if(tab==='downloads')renderDlTab();
+}
+
+// ─── SORT ───
+function openSort(){document.getElementById('sort-sheet').classList.add('open');}
+function closeSortOutside(e){if(e.target===document.getElementById('sort-sheet'))document.getElementById('sort-sheet').classList.remove('open');}
+function setSort(s,el){
+  sortBy=s;
+  document.querySelectorAll('.sort-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  const btn=document.getElementById('sort-btn');
+  btn.classList.toggle('active',s!=='default');
+  document.getElementById('sort-sheet').classList.remove('open');
+  render();
+}
+
+// ─── SEARCH CLEAR ───
+function clearSearch(){
+  document.getElementById('search').value='';
+  searchVal='';
+  document.getElementById('search-clear').classList.remove('show');
+  render();
+}
+
+// ─── GUIDE ───
+function openGuide(){document.getElementById('guide-modal').classList.add('open');}
+function closeGuide(e){
+  if(!e||e.target===document.getElementById('guide-modal')||e.currentTarget===document.querySelector('.guide-close'))
+    document.getElementById('guide-modal').classList.remove('open');
+}
+
+// ─── SHARE ───
+function shareStore(){
+  const url=window.location.href;
+  if(navigator.share){navigator.share({title:'zigeStore',text:'Le store APK de la famille !',url}).catch(()=>{});}
+  else{navigator.clipboard.writeText(url).then(()=>toast('🔗 Lien copié !'));}
+}
+function shareApp(a){
+  const txt=`${a.name} ${a.version} — disponible sur zigeStore`;
+  if(navigator.share){navigator.share({title:a.name,text:txt,url:window.location.href}).catch(()=>{});}
+  else{navigator.clipboard.writeText(txt).then(()=>toast('📋 Info copiée !'));}
+}
+
+// ─── TOAST ───
+let toastTimer;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
+}
+
+// ─── BACK BUTTON ───
+window.addEventListener('popstate',()=>{
+  if(document.getElementById('app-modal').classList.contains('open')){closeModal();history.pushState(null,'',location.href);}
+  else if(document.getElementById('guide-modal').classList.contains('open')){closeGuide();}
+});
+history.pushState(null,'',location.href);
+</script>
+</body>
+</html>
