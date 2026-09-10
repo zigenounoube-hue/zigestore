@@ -19,8 +19,8 @@
     "changelog": "• Correctifs pour les playlists YouTube\n• Amélioration du lecteur audio\n• Support de nouveaux formats vidéo",
     "permissions": ["Internet", "Stockage"],
     "screenshots": [
-      "https://f-droid.org/repo/org.schabi.newpipe/en-US/phoneScreenshots/1.png",
-      "https://f-droid.org/repo/org.schabi.newpipe/en-US/phoneScreenshots/2.png",
+      "image/1000042234.jpg",
+      "zigestore/image/1000042234.jpg",
       "https://f-droid.org/repo/org.schabi.newpipe/en-US/phoneScreenshots/3.png"
     ]
   },
