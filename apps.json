@@ -20,7 +20,7 @@
     "permissions": ["Internet", "Stockage"],
     "screenshots": [
       "image/1000042234.png",
-      "zigestore/image/1000042234.png",
+      "",
       "https://f-droid.org/repo/org.schabi.newpipe/en-US/phoneScreenshots/3.png"
     ]
   },
