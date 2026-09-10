@@ -20,8 +20,8 @@
     "permissions": ["Internet", "Stockage"],
     "screenshots": [
       "image/1000042234.png",
-      "",
-      "https://f-droid.org/repo/org.schabi.newpipe/en-US/phoneScreenshots/3.png"
+      "image/newpipe2.png",
+      "image/newpipe3.png"
     ]
   },
   {
@@ -114,4 +114,27 @@
     "permissions": ["Internet", "Stockage", "Micro (optionnel)"],
     "screenshots": []
   }
+  {
+  "id": "mihon",
+  "name": "Mihon",
+  "developer": "mihonapp",
+  "description": "Lecteur de manga open-source. Successeur de Tachiyomi.",
+  "longDescription": "Mihon est un lecteur de manga, webtoon et comics open-source pour Android. Successeur officiel de Tachiyomi, il permet d'ajouter des sources via des extensions, de synchroniser ta progression avec MyAnimeList, AniList ou Kitsu, et de lire en mode webtoon ou manga classique. Bibliothèque centralisée, téléchargement hors-ligne, thèmes personnalisables.",
+  "version": "v0.20.4",
+  "category": "Médias",
+  "apkUrl": "",
+  "externalUrl": "https://github.com/mihonapp/mihon/releases/latest",
+  "website": "https://mihon.app",
+  "iconEmoji": "📚",
+  "iconBg": "#1a0f2a",
+  "sizeMb": 16.0,
+  "featured": false,
+  "available": false,
+  "addedDate": "2025-09-08",
+  "changelog": "• Support des trackers MangaBaka et Hikka\n• Option pour le navigateur de chapitres vertical\n• Amélioration du cache de téléchargement\n• Correctifs de crashes",
+  "permissions": ["Internet", "Stockage"],
+  "screenshots": [
+    "image/mihon1.png", "image/mihon2.png","image/mihon3.png"
+  ]
+}
 ]
